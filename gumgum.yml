@@ -4,13 +4,29 @@
     become_method: sudo
     tasks:
       - name: install nginx server in ubuntu 14.04 LTS
-        apt: pkg={{item}} state=present update_cache=true
-        with_item:
+        apt: name={{item}} state=present update_cache=true
+        with_items:
           - python
           - python-pip
           - nginx
         notify:
           - start nginx
+      - name: create directories to clone flask
+        file: path=/opt/releases/{{ app_name }} state=directory
     handlers:
       - name: start nginx
         service: name=nginx state=started
+
+  #installing flask app by creating virtul environment
+  - hosts: webservers
+    tasks:
+      - name: clone git repo
+        git:
+          repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
+          dest: /opt/releases/{{ app_name }}
+          update: yes
+      - name: Install modules for flask application in environment
+        pip:
+          requirements: /Users/Pruthvi/finalAnsible/requirements.txt
+          virtualenv: /opt/releases/{{ app_name }}/env
+          virtualenv_python: python2.7
