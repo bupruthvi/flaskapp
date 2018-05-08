@@ -59,6 +59,33 @@
         template:
           src: .nginx
           dest: /etc/nginx/sites-available/{{ app_name }}
+      - name: remove default nginx conf
+        file: path=/etc/nginx/sites-available/default state=absent
+      - name: enable the nginx site
+        file:
+          src: path=/etc/nginx/sites-available/{{ app_name }}
+          dest: path=/etc/nginx/sites-enabled/default
+          state: link
+          force: yes
+      - name: restart nginx
+        init: name=nginx restarted=yes enabled=yes
+      - name: open the firewall
+        ufw:
+          rule: allow
+          name: Nginx full
+  #quick check on the Application
+  - hosts: webservers
+    tasks:
+      - name: get url
+        get_url:
+          url: http://{{inventory_hostname}}
+          dest: /tmp/index.html
+      - name: read html
+        shell: cat /tmp/index.html
+        register: html_contents
+      - name: check for string in html
+        when: html_contents.stdout.find('hello') != -1
+        debug: msg="success!"
       #- name: start init.d app service
       #  service:
       #    name: GumGum-Flask-Application
