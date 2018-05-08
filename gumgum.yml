@@ -53,9 +53,15 @@
         copy:
           src: .service
           dest: /etc/init.d/{{ app_name }}.service
-      - name: start init.d app service
-        service:
-          name: GumGum-Flask-Application
-          pattern: /etc/init.d/GumGum-Flask-Application.service
-          state: started
+      - name: start initd app service
+        init : name={{ app_name }}.service state=restarted
+      - name: nginx site configuring
+        template:
+          src: .nginx
+          dest: /etc/nginx/sites-available/{{ app_name }}
+      #- name: start init.d app service
+      #  service:
+      #    name: GumGum-Flask-Application
+      #    pattern: /etc/init.d/GumGum-Flask-Application.service
+      #    state: started
       #  init.d: name={{ app_name }}.service state=restarted enabled=yes
