@@ -1,0 +1,8 @@
+[webservers]
+54.153.110.32
+
+#vars
+[webservers:vars]
+ansible_ssh_user=ubuntu
+github_user=pruthvi992
+app_name=flask_gumgum

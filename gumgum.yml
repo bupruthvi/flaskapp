@@ -1,0 +1,16 @@
+---
+  - hosts: webservers
+    become: yes
+    become_method: sudo
+    tasks:
+      - name: install nginx server in ubuntu 14.04 LTS
+        apt: pkg={{item}} state=present update_cache=true
+        with_item:
+          - python
+          - python-pip
+          - nginx
+        notify:
+          - start nginx
+    handlers:
+      - name: start nginx
+        service: name=nginx state=started
