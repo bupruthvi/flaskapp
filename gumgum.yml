@@ -11,6 +11,8 @@
           - nginx
           - git
           - gunicorn
+          - python-virtualenv
+          
       - name: install flask using pip
         pip:
           name: flask
@@ -36,6 +38,10 @@
           repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
           dest: /opt/releases/{{ app_name }}
           update: yes
+      - name: install modules in a virtualenv
+        pip:
+          virtualenv: /opt/releases/{{ ansible_ssh_user }}/{{ app_name }}/env
+          virtualenv_python: python
 
   #configuring initd to start services
   - hosts: webservers
