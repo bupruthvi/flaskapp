@@ -9,6 +9,13 @@
           - python
           - python-pip
           - nginx
+          - git
+          - gunicorn
+      - name: install flask using pip
+        pip:
+          name: flask
+          version: 0.11
+
         notify:
           - start nginx
       - name: create directories to clone flask
@@ -17,16 +24,31 @@
       - name: start nginx
         service: name=nginx state=started
 
+
+
   #installing flask app by creating virtul environment
   - hosts: webservers
+    become: yes
+    become_method: sudo
     tasks:
       - name: clone git repo
         git:
           repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
           dest: /opt/releases/{{ app_name }}
           update: yes
-      - name: Install modules for flask application in environment
-        pip:
-          requirements: /Users/Pruthvi/finalAnsible/requirements.txt
-          virtualenv: /opt/releases/{{ app_name }}/env
-          virtualenv_python: python2.7
+
+  #configuring initd to start services
+  - hosts: webservers
+    become: yes
+    become_method: sudo
+    tasks:
+      - name: init.d service config
+        copy:
+          src: .service
+          dest: /etc/init.d/{{ app_name }}.service
+      - name: start init.d app service
+        service:
+          name: GumGum-Flask-Application
+          pattern: /etc/init.d/GumGum-Flask-Application.service
+          state: started
+      #  init.d: name={{ app_name }}.service state=restarted enabled=yes

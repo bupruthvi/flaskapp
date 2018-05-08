@@ -1,0 +1,12 @@
+[Unit]
+Description=Gunicorn instance to serve {{ app_name }}
+After=network.target
+
+[Service]
+User={{ ansible_ssh_user }}
+Group=www-data
+WorkingDirectory=/opt/releases/{{ ansible_ssh_user }}/{{ app_name }}
+ExecStart=/opt/releases/{{ app_name }} --workers 3 --bind unix:{{ app_name }}.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
