@@ -68,7 +68,7 @@
           state: link
           force: yes
       - name: restart nginx
-        init: name=nginx restarted=yes enabled=yes
+        init.d: name=nginx restarted=yes enabled=yes
       - name: open the firewall
         ufw:
           rule: allow
