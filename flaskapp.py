@@ -5,7 +5,7 @@ import logging
 application = Flask(__name__)
 
 handler = logging.handlers.TimedRotatingFileHandler(
-  '/var/log/gumgum/flask_blog_app.log', when='m', interval=1)
+  '/var/log/gumgum/flask_blog_app.log', when='h', interval=1)
 formatter = logging.Formatter(logging.BASIC_FORMAT)
 handler.setFormatter(formatter)
 
