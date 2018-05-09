@@ -2,10 +2,12 @@ from flask import Flask, jsonify
 import logging
 application = Flask(__name__)
 
+logging.basicConfig(
+  format='%(asctime)s %(levelname)s %(message)s',
+  level=logging.WARNING,
+  filename='/var/log/gumgum/flask_blog_app.log')
+
 logger = logging.getLogger('mainLogger')
-logger.addHandler(logging.FileHandler('/var/log/gumgum/flask_blog_app.log'))
-logger.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-logger.setLevel(logging.WARNING)
 
 @application.route("/")
 def hello():

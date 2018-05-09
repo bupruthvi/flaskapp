@@ -36,10 +36,15 @@
       - name: installing virtual environment
         pip:
          name: virtualenv
+      - name: Check if virtual env already exists
+        stat:
+          path: "/opt/releases/{{ app_name }}/flaskappenv"
+        register: stat_result
       - name: create virtual environment
         command: "{{ item }} chdir=/opt/releases/{{ app_name }}"
         with_items:
           - virtualenv flaskappenv
+        when: stat_result.stat.exists == False
       - name: install flask and gunicorn within virtualenv
         pip: name={{item}} virtualenv=/opt/releases/flaskapp/flaskappenv
         with_items:
