@@ -21,9 +21,13 @@
     become: yes
     become_method: sudo
     tasks:
-
       - name: create directory
         file: path=/opt/releases/{{ app_name }} state=directory
+      - name: clone repo
+        git:
+          repo: https://github.com/{{ github_user}}/{{ app_name }}.git
+          dest: /opt/releases/{{ app_name }}
+          update: yes
       - name: installing virtual environment
         pip:
          name: virtualenv
@@ -36,21 +40,37 @@
         with_items:
             - flask
             - gunicorn
-      - name: clone repo
-        git:
-          repo: https://github.com/{{ github_user}}/{{ app_name }}.git
-          dest: /opt/releases/{{ app_name }}
-          update: yes
+
 
   - hosts: webservers
     become: yes
     become_method: sudo
     tasks:
-    - name: configure app to be upstart script
-      copy:
-        src: ./{{ app_name }}.conf
-        dest: /etc/init/{{ app_name }}.conf
-    - name: start app
-      service:
-        name: "{{ app_name }}"
-        state: started
+      - name: configure app to be upstart script
+        copy:
+          src: ./{{ app_name }}.conf
+          dest: /etc/init/{{ app_name }}.conf
+      - name: start app
+        service:
+          name: "{{ app_name }}"
+          state: started
+      #copied starts
+      - name: template nginx site config
+        template:
+          src: .nginx
+          dest: /etc/nginx/sites-available/{{ app_name }}
+      - name: remove default nginx site config
+        file: path=/etc/nginx/sites-enabled/default state=absent
+      #- command: mv /etc/nginx/sites-enabled/default /tmp/nginx.sites-enabled.default
+      - name: enable nginx site
+        file:
+          src: /etc/nginx/sites-available/{{ app_name }}
+          dest: /etc/nginx/sites-enabled/default
+          state: link
+          force: yes
+      - name: restart nginx
+        service: name=nginx state=restarted enabled=yes
+      - name: open firewall for nginx
+        ufw:
+          rule: allow
+          name: Nginx Full

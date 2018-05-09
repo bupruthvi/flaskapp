@@ -2,7 +2,7 @@ server{
 	listen 80;
 
 	location / {
-		inlcude procy_params;
+		include proxy_params;
 		proxy_pass http://unix:/opt/releases/{{ app_name }}/{{ app_name }}.sock;
     }
 }
