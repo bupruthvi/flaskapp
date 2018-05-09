@@ -6,8 +6,3 @@ server{
 		proxy_pass http://unix:/opt/releases/{{ app_name }}/{{ app_name }}.sock;
     }
 }
-
-server{
-  listen 443;
-  return 301 http://$host$request_uri;
-}

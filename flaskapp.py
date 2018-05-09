@@ -1,13 +1,17 @@
 from flask import Flask, jsonify
 import logging
+
+
 application = Flask(__name__)
 
-logging.basicConfig(
-  format='%(asctime)s %(levelname)s %(message)s',
-  level=logging.DEBUG,
-  filename='/var/log/gumgum/flask_blog_app.log')
+handler = logging.handlers.TimedRotatingFileHandler(
+  '/var/log/gumgum/flask_blog_app.log', when='m', interval=1)
+formatter = logging.Formatter(logging.BASIC_FORMAT)
+handler.setFormatter(formatter)
 
 logger = logging.getLogger('mainLogger')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(handler)
 
 @application.route("/")
 def hello():

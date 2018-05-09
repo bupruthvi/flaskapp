@@ -48,7 +48,7 @@
       - name: install flask and gunicorn within virtualenv
         pip: name={{item}} virtualenv=/opt/releases/flaskapp/flaskappenv
         with_items:
-            - flask
+            - flask==0.11
             - gunicorn
   - hosts: webservers
     become: yes
