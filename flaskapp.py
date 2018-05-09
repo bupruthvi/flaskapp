@@ -16,4 +16,5 @@ def health():
     return jsonify({'status': 'ok'})
 
 if __name__ == "__main__":
+    _logger.info('Starting application.')
     application.run(host='0.0.0.0')
