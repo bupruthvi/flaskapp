@@ -48,5 +48,9 @@
     tasks:
     - name: configure app to be upstart script
       copy:
-        src: path=/opt/releases/{{app_name}}/{{ app_name }}.conf
-        dest: path=/etc/init/{{ app_name }}.conf
+        src: ./{{ app_name }}.conf
+        dest: /etc/init/{{ app_name }}.conf
+    - name: start app
+      service:
+        name: "{{ app_name }}"
+        state: started
