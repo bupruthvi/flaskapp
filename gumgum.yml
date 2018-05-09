@@ -16,8 +16,9 @@
           - python-pip
           - python-dev
           - nginx
+          - git
   - hosts: webservers
-    become: true
+    become: yes
     become_method: sudo
     tasks:
 
@@ -27,9 +28,25 @@
         pip:
          name: virtualenv
       - name: create virtual environment
-        command: chdir=/opt/releases/{{ app_name }}
-        command: virtualenv flaskappenv
+        command: "{{ item }} chdir=/opt/releases/{{ app_name }}"
+        with_items:
+          - virtualenv flaskappenv
+      - name: install flask and gunicorn within virtualenv
+        pip: name={{item}} virtualenv=/opt/releases/flaskapp/flaskappenv
+        with_items:
+            - flask
+            - gunicorn
       - name: clone repo
         git:
-          src: https://github.com/{{ github_user}}/{{ app_name }}.git
+          repo: https://github.com/{{ github_user}}/{{ app_name }}.git
           dest: /opt/releases/{{ app_name }}
+          update: yes
+
+  - hosts: webservers
+    become: yes
+    become_method: sudo
+    tasks:
+    - name: configure app to be upstart script
+      copy:
+        src: path=/opt/releases/{{app_name}}/{{ app_name }}.conf
+        dest: path=/etc/init/{{ app_name }}.conf
