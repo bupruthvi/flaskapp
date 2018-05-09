@@ -1,5 +1,10 @@
 from flask import Flask, jsonify
+from logging import FileHandler, WARNING
 application = Flask(__name__)
+
+file_handler = FileHandler('errorlog.txt')
+file_handler.setlevel(WARNING)
+app.logging.addHandler(file_handler)
 
 @application.route("/")
 def hello():
