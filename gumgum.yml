@@ -3,92 +3,39 @@
     become: yes
     become_method: sudo
     tasks:
+      - name: Update and upgrade apt packages
+        become: true
+        apt:
+         upgrade: yes
+         update_cache: yes
+         cache_valid_time: 86400
       - name: install nginx server in ubuntu 14.04 LTS
         apt: name={{item}} state=present update_cache=true
         with_items:
           - python
           - python-pip
+          - python-dev
           - nginx
-          - git
-          - gunicorn
-          - python-virtualenv
+  - hosts: webservers
+    become: true
+    become_method: sudo
+    tasks:
 
-      - name: install flask using pip
-        pip:
-          name: flask
-          version: 0.11
-
-        notify:
-          - start nginx
-      - name: create directories to clone flask
+      - name: create directory
         file: path=/opt/releases/{{ app_name }} state=directory
-    handlers:
-      - name: start nginx
-        service: name=nginx state=started
-
-
-
-  #installing flask app by creating virtul environment
-  - hosts: webservers
-    become: yes
-    become_method: sudo
-    tasks:
-      - name: clone git repo
-        git:
-          repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
-          dest: /opt/releases/{{ app_name }}
-          update: yes
-      - name: install modules in a virtualenv
+      - name: installing virtual environment
         pip:
-          requirements: /opt/releases/{{ app_name }}/requirements.txt
-          virtualenv: /opt/releases/{{ app_name }}/env
-          virtualenv_python: python
+         name: virtualenv
+      - name: create virtual environment
+        command: chdir=/opt/releases/{{ app_name }}
+        command: virtualenv flaskappenv
 
-  #configuring initd to start services
-  - hosts: webservers
-    become: yes
-    become_method: sudo
-    tasks:
-      - name: init.d service config
-        copy:
-          src: .service
-          dest: /etc/init.d/{{ app_name }}.service
-      - name: start initd app service
-        init : name={{ app_name }}.service state=restarted
-      - name: nginx site configuring
-        template:
-          src: .nginx
-          dest: /etc/nginx/sites-available/{{ app_name }}
-      - name: remove default nginx conf
-        file: path=/etc/nginx/sites-available/default state=absent
-      - name: enable the nginx site
-        file:
-          src: path=/etc/nginx/sites-available/{{ app_name }}
-          dest: path=/etc/nginx/sites-enabled/default
-          state: link
-          force: yes
-      - name: restart nginx
-        init.d: name=nginx restarted=yes enabled=yes
-      - name: open the firewall
-        ufw:
-          rule: allow
-          name: Nginx full
-  #quick check on the Application
-  - hosts: webservers
-    tasks:
-      - name: get url
-        get_url:
-          url: http://{{inventory_hostname}}
-          dest: /tmp/index.html
-      - name: read html
-        shell: cat /tmp/index.html
-        register: html_contents
-      - name: check for string in html
-        when: html_contents.stdout.find('hello') != -1
-        debug: msg="success!"
-      #- name: start init.d app service
-      #  service:
-      #    name: GumGum-Flask-Application
-      #    pattern: /etc/init.d/GumGum-Flask-Application.service
-      #    state: started
-      #  init.d: name={{ app_name }}.service state=restarted enabled=yes
+  #- hosts: webservers
+  #  tasks:
+  #    become: true
+  #    become_method: sudo
+      #- name: create directory
+      #  file: /opt/releases/{{ app_name }}
+      #- name: clone repo
+      #  git:
+      #    src: https://github.com/{{ github_user}}/{{ app_name }}.git
