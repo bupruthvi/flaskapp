@@ -29,13 +29,7 @@
       - name: create virtual environment
         command: chdir=/opt/releases/{{ app_name }}
         command: virtualenv flaskappenv
-
-  #- hosts: webservers
-  #  tasks:
-  #    become: true
-  #    become_method: sudo
-      #- name: create directory
-      #  file: /opt/releases/{{ app_name }}
-      #- name: clone repo
-      #  git:
-      #    src: https://github.com/{{ github_user}}/{{ app_name }}.git
+      - name: clone repo
+        git:
+          src: https://github.com/{{ github_user}}/{{ app_name }}.git
+          dest: /opt/releases/{{ app_name }}
