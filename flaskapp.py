@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
-from logging import FileHandler, WARNING
+import logging
 application = Flask(__name__)
 
-file_handler = FileHandler('flaskapp.log', pathname='/opt/releases/flaskapp/flaskappenv')
-file_handler.setlevel(WARNING)
-app.logging.addHandler(file_handler)
+_logger = logging.getLogger('mainLogger')
+lfhdlr = logging.FileHandler('/var/log/gumgum/flask_blog_app.log')
+_logger.addHandler(lfhdlr)
+_logger.setLevel(logging.INFO)
 
 @application.route("/")
 def hello():

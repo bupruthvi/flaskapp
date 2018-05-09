@@ -13,13 +13,15 @@
          update_cache: yes
          cache_valid_time: 86400
       - name: install nginx server in ubuntu 14.04 LTS
-        apt: name={{item}} state=present update_cache=true
+        apt: name={{ item }} state=present update_cache=true
         with_items:
           - python
           - python-pip
           - python-dev
           - nginx
           - git
+      - name: create log directory
+        file: path=/var/log/gumgum state=directory
   - hosts: webservers
     become: yes
     become_method: sudo
@@ -56,14 +58,14 @@
           name: "{{ app_name }}"
           state: restarted
           enabled: yes
-      #copied starts
+
       - name: template nginx site config
         template:
           src: .nginx
           dest: /etc/nginx/sites-available/{{ app_name }}
       - name: remove default nginx site config
         file: path=/etc/nginx/sites-enabled/default state=absent
-      #- command: mv /etc/nginx/sites-enabled/default /tmp/nginx.sites-enabled.default
+
       - name: enable nginx site
         file:
           src: /etc/nginx/sites-available/{{ app_name }}
