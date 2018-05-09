@@ -53,7 +53,8 @@
       - name: start app
         service:
           name: "{{ app_name }}"
-          state: started
+          state: restarted
+          enabled: yes
       #copied starts
       - name: template nginx site config
         template:
