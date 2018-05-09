@@ -1,11 +1,11 @@
 from flask import Flask, jsonify
 application = Flask(__name__)
 
-@app.route("/")
+@application.route("/")
 def hello():
     return "<h1 style='color:blue'>Hello World</h1>"
 
-@app.route("/health")
+@application.route("/health")
 def health():
     return jsonify({'status': 'ok'})
 
