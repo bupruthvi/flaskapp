@@ -4,7 +4,7 @@ application = Flask(__name__)
 
 logging.basicConfig(
   format='%(asctime)s %(levelname)s %(message)s',
-  level=logging.WARNING,
+  level=logging.DEBUG,
   filename='/var/log/gumgum/flask_blog_app.log')
 
 logger = logging.getLogger('mainLogger')
